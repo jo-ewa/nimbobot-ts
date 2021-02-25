@@ -1,4 +1,6 @@
+import { Message } from "discord.js"
 import { PREFIX } from "./config"
+import ytdl from "discord-ytdl-core"
 
 export async function onMessage(message: Message) {
     try {
@@ -11,8 +13,25 @@ export async function onMessage(message: Message) {
 
         if (command === "play") {
             //play url
+            const voiceChannel = message.member?.voice.channel
+            if (!voiceChannel) {
+                await message.channel.send("You must be in a voice channel")
+                return
+            }
+
+            const url = args[0]
+            const stream = ytdl(url)
+
+            const connection = await voiceChannel.join()
+
+            connection.play(stream, {type: "opus"}).on("error", (error) => console.log(error)).on("close", () => {
+                stream.destroy()
+                connection.disconnect()
+            })
         } else if (command === "stop") {
             await message.channel.send("Uknown")
+        } else {
+            await message.channel.send("Unknown command, try _play or _stop")
         }
     } catch (error) {
         console.log(error)
