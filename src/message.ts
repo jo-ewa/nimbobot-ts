@@ -29,7 +29,14 @@ export async function onMessage(message: Message) {
                 connection.disconnect()
             })
         } else if (command === "stop") {
-            await message.channel.send("Uknown")
+            const voiceChannel = message.member?.voice.channel
+            if (!voiceChannel) {
+                await message.channel.send("You must be in a voice channel")
+                return
+            }
+
+            const connection = await voiceChannel.join()
+            connection.disconnect()
         } else {
             await message.channel.send("Unknown command, try _play or _stop")
         }
