@@ -6,13 +6,13 @@ export async function onMessage(message: Message) {
     try {
         if (!message.content.startsWith(PREFIX) || message.author.bot) return
 
-        console.log(`Recieved message from ${message.author.username} saying: ${message.content}`)
+        console.log(`Received message from ${message.author.username} saying: ${message.content}`)
 
         const args = message.content.slice(PREFIX.length).trim().split(/ +/)
         const command = args.shift()?.toLowerCase()
 
         if (command === "play") {
-            //play url
+            // play url
             const voiceChannel = message.member?.voice.channel
             if (!voiceChannel) {
                 await message.channel.send("You must be in a voice channel")
@@ -24,11 +24,15 @@ export async function onMessage(message: Message) {
 
             const connection = await voiceChannel.join()
 
-            connection.play(stream, {type: "opus"}).on("error", (error) => console.log(error)).on("close", () => {
-                stream.destroy()
-                connection.disconnect()
-            })
+            connection
+                .play(stream, { type: "opus" })
+                .on("error", (error) => console.log(error))
+                .on("close", () => {
+                    stream.destroy()
+                    connection.disconnect()
+                })
         } else if (command === "stop") {
+            // stop
             const voiceChannel = message.member?.voice.channel
             if (!voiceChannel) {
                 await message.channel.send("You must be in a voice channel")
